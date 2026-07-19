@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>词径 · Wordpath</title>
+<meta name="description" content="高考核心词汇学习">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --ink:#0B1220; --ink-2:#131C2E; --ink-3:#1C2739;
+  --paper:#F7F4EC; --paper-2:#EDE8DC;
+  --jade:#00C08B; --jade-dim:#0A8F69;
+  --amber:#FFB454; --rose:#FF6B7A; --iris:#8B7CFF;
+  --line:rgba(255,255,255,.10);
+  --bg:var(--ink); --surface:var(--ink-2); --surface-2:var(--ink-3);
+  --text:#EEF2F8; --text-2:#98A6BC; --text-3:#5F6E86;
+  --accent:var(--jade);
+  --f-display:'Fraunces','Noto Serif SC',serif;
+  --f-body:'Inter','Noto Sans SC',system-ui,sans-serif;
+  --r:16px; --r-lg:24px;
+  --shadow:0 8px 40px rgba(0,0,0,.45);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+[data-theme="light"]{
+  --bg:var(--paper); --surface:#FFFFFF; --surface-2:var(--paper-2);
+  --text:#141C2B; --text-2:#5A6678; --text-3:#96A0B0;
+  --line:rgba(11,18,32,.10);
+  --jade:#00996E; --shadow:0 8px 40px rgba(20,28,43,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Inter','Noto Sans SC',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  transition:background .5s var(--ease), color .5s var(--ease);
+  overflow-x:hidden;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input{font:inherit}
+:focus-visible{outline:2.5px solid var(--accent); outline-offset:3px; border-radius:6px}
+::selection{background:var(--accent);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ============ ATMOSPHERE ============ */
+.aura{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.aura b{position:absolute;border-radius:50%;filter:blur(90px);opacity:.16;animation:drift 26s var(--ease) infinite}
+.aura b:nth-child(1){width:46vw;height:46vw;background:var(--jade);top:-14%;left:-10%}
+.aura b:nth-child(2){width:38vw;height:38vw;background:var(--iris);bottom:-14%;right:-8%;animation-delay:-9s}
+.aura b:nth-child(3){width:30vw;height:30vw;background:var(--amber);top:44%;left:52%;animation-delay:-17s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(5vw,-4vh) scale(1.12)}66%{transform:translate(-4vw,5vh) scale(.92)}}
+
+/* ============ GATE ============ */
+#gate{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;
+  background:var(--bg);transition:opacity .7s var(--ease),visibility .7s}
+#gate.out{opacity:0;visibility:hidden}
+.gate-card{position:relative;z-index:1;width:min(420px,100%);text-align:center;animation:rise .8s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.brand{font-family:var(--f-display);font-weight:900;font-size:clamp(52px,13vw,76px);line-height:.9;letter-spacing:-.03em}
+.brand em{font-style:normal;color:var(--accent)}
+.brand-sub{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--text-3);margin-top:14px}
+.gate-form{margin-top:38px;display:flex;flex-direction:column;gap:12px}
+.field{position:relative}
+.field input{width:100%;padding:17px 20px;border-radius:var(--r);border:1.5px solid var(--line);
+  background:var(--surface);color:var(--text);font-size:16px;text-align:center;letter-spacing:.16em;
+  transition:border-color .3s,box-shadow .3s}
+.field input::placeholder{letter-spacing:.06em;color:var(--text-3)}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.btn{padding:17px 20px;border-radius:var(--r);background:var(--accent);color:#04140E;font-weight:700;
+  font-size:15px;letter-spacing:.02em;transition:transform .2s var(--ease),filter .2s}
+.btn:hover{filter:brightness(1.1)} .btn:active{transform:scale(.97)}
+.gate-err{color:var(--rose);font-size:13px;min-height:18px;font-weight:500}
+.shake{animation:shake .42s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.gate-hint{margin-top:20px;font-size:12px;color:var(--text-3)}
+
+/* ============ SHELL ============ */
+#app{display:none;position:relative;z-index:1;min-height:100dvh;flex-direction:column}
+#app.on{display:flex}
+header{position:sticky;top:0;z-index:40;backdrop-filter:blur(18px) saturate(1.6);
+  background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:1px solid var(--line)}
+.hwrap{max-width:1160px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;gap:14px}
+.logo{font-family:var(--f-display);font-weight:900;font-size:23px;letter-spacing:-.02em;flex-shrink:0}
+.logo em{font-style:normal;color:var(--accent)}
+.streak{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;
+  background:color-mix(in srgb,var(--amber) 14%,transparent);color:var(--amber);
+  font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.spacer{flex:1}
+.icon-btn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--surface);transition:background .2s,transform .2s}
+.icon-btn:hover{background:var(--surface-2)} .icon-btn:active{transform:scale(.93)}
+.icon-btn svg{width:17px;height:17px;stroke:var(--text-2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* progress rail */
+.rail{height:2.5px;background:var(--surface-2);position:relative;overflow:hidden}
+.rail i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--jade),var(--iris));transition:transform .6s var(--ease)}
+
+main{flex:1;max-width:1160px;width:100%;margin:0 auto;padding:26px 18px 100px}
+.view{display:none;animation:fade .45s var(--ease)}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ============ NAV ============ */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:45;
+  backdrop-filter:blur(20px) saturate(1.6);
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nwrap{max-width:1160px;margin:0 auto;display:flex}
+.nav-i{flex:1;padding:11px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  color:var(--text-3);transition:color .25s;position:relative}
+.nav-i.on{color:var(--accent)}
+.nav-i.on::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:26px;height:2.5px;border-radius:0 0 3px 3px;background:var(--accent)}
+.nav-i svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav-i span{font-size:10px;font-weight:600;letter-spacing:.02em}
+
+/* ============ CARDS/GENERIC ============ */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--text-3);margin-bottom:12px}
+h2.t{font-family:var(--f-display);font-weight:600;font-size:clamp(26px,5vw,34px);letter-spacing:-.02em;margin-bottom:5px}
+.sub{color:var(--text-2);font-size:14px;margin-bottom:22px;line-height:1.55}
+
+/* deck picker */
+.decks{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-bottom:26px}
+.deck{position:relative;text-align:left;padding:22px;border-radius:var(--r-lg);
+  border:1.5px solid var(--line);background:var(--surface);overflow:hidden;
+  transition:border-color .3s,transform .3s var(--ease)}
+.deck:hover{transform:translateY(-3px)}
+.deck.on{border-color:var(--accent)}
+.deck.on::after{content:'';position:absolute;inset:0;background:var(--accent);opacity:.06;pointer-events:none}
+.deck-n{font-family:var(--f-display);font-size:34px;font-weight:900;letter-spacing:-.02em;line-height:1}
+.deck-t{font-weight:700;font-size:15px;margin-top:8px}
+.deck-d{font-size:12.5px;color:var(--text-2);margin-top:4px;line-height:1.5}
+.deck-bar{height:4px;border-radius:99px;background:var(--surface-2);margin-top:14px;overflow:hidden}
+.deck-bar i{display:block;height:100%;border-radius:99px;background:var(--accent);transition:width .6s var(--ease)}
+.deck-pct{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-3);margin-top:7px}
+
+/* mode grid */
+.modes{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.mode{position:relative;text-align:left;padding:19px;border-radius:var(--r);border:1px solid var(--line);
+  background:var(--surface);overflow:hidden;transition:transform .3s var(--ease),border-color .3s}
+.mode:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+.mode .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;margin-bottom:12px;
+  background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.mode .ic svg{width:17px;height:17px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mode h3{font-size:14.5px;font-weight:700;margin-bottom:3px}
+.mode p{font-size:12px;color:var(--text-2);line-height:1.45}
+.mode .due{position:absolute;top:14px;right:14px;min-width:22px;height:22px;padding:0 6px;border-radius:99px;
+  background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;
+  font-variant-numeric:tabular-nums}
+
+/* ============ FLASHCARD ============ */
+.stage{max-width:620px;margin:0 auto}
+.bar-top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.count{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.flip{perspective:1800px;height:min(58vh,430px);margin-bottom:18px}
+.flip-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .62s var(--ease)}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface);
+  box-shadow:var(--shadow);padding:30px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;cursor:pointer;overflow-y:auto}
+.face.b{transform:rotateY(180deg)}
+.w-main{font-family:var(--f-display);font-weight:600;font-size:clamp(34px,8vw,54px);
+  letter-spacing:-.03em;line-height:1.05;word-break:break-word}
+.w-ph{font-family:'JetBrains Mono',monospace;color:var(--text-2);font-size:14px;margin-top:12px}
+.pos-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.pos{padding:3px 9px;border-radius:6px;background:var(--surface-2);color:var(--text-2);
+  font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.freq{margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber)}
+.tap{margin-top:auto;padding-top:20px;font-size:11.5px;color:var(--text-3);letter-spacing:.04em}
+.w-mean{font-family:'Noto Sans SC',sans-serif;font-size:clamp(19px,4.4vw,25px);font-weight:500;
+  line-height:1.55;margin-bottom:18px}
+.ex{width:100%;text-align:left;padding:14px 16px;border-radius:12px;background:var(--surface-2);margin-top:10px}
+.ex-en{font-size:14px;line-height:1.55}
+.ex-zh{font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--text-2);line-height:1.6;margin-top:7px}
+.src{font-size:11px;color:var(--text-3);margin-top:12px;font-family:'Noto Sans SC',sans-serif}
+.spk{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:9px;
+  background:var(--surface-2);margin-left:9px;vertical-align:middle;flex-shrink:0;transition:transform .2s}
+.spk:hover{transform:scale(1.1)} .spk:active{transform:scale(.9)}
+.spk svg{width:15px;height:15px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.spk.play{animation:pulse .7s infinite}
+@keyframes pulse{50%{background:color-mix(in srgb,var(--accent) 26%,transparent)}}
+.ex-head{display:flex;align-items:flex-start;gap:8px;justify-content:space-between}
+
+/* grade buttons */
+.grades{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grade{padding:14px 6px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);
+  font-size:12.5px;font-weight:700;transition:transform .2s var(--ease),background .2s,border-color .2s}
+.grade:active{transform:scale(.94)}
+.grade small{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:400;
+  color:var(--text-3);margin-top:3px}
+.grade[data-g="0"]:hover{border-color:var(--rose);background:color-mix(in srgb,var(--rose) 12%,transparent)}
+.grade[data-g="1"]:hover{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 12%,transparent)}
+.grade[data-g="2"]:hover{border-color:var(--jade);background:color-mix(in srgb,var(--jade) 12%,transparent)}
+.grade[data-g="3"]:hover{border-color:var(--iris);background:color-mix(in srgb,var(--iris) 12%,transparent)}
+
+/* ============ QUIZ ============ */
+.q-prompt{text-align:center;padding:32px 20px;border-radius:var(--r-lg);background:var(--surface);
+  border:1px solid var(--line);margin-bottom:18px;min-height:150px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center}
+.q-word{font-family:var(--f-display);font-weight:600;font-size:clamp(28px,6.5vw,44px);letter-spacing:-.02em;line-height:1.1}
+.q-word.zh{font-family:'Noto Sans SC',sans-serif;font-weight:500;font-size:clamp(21px,4.6vw,29px);line-height:1.5}
+.q-hint{font-size:12.5px;color:var(--text-3);margin-top:12px}
+.opts{display:grid;gap:10px}
+.opt{padding:16px 18px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);
+  text-align:left;font-size:15px;transition:transform .2s var(--ease),border-color .25s,background .25s;
+  font-family:'Noto Sans SC',sans-serif;line-height:1.5}
+.opt:hover:not(:disabled){border-color:var(--accent);transform:translateX(4px)}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--jade);background:color-mix(in srgb,var(--jade) 15%,transparent)}
+.opt.no{border-color:var(--rose);background:color-mix(in srgb,var(--rose) 15%,transparent)}
+.opt.en{font-family:var(--f-display);font-weight:600;font-size:19px}
+
+/* ============ SPELL ============ */
+.spell-in{width:100%;padding:18px;border-radius:var(--r);border:1.5px solid var(--line);
+  background:var(--surface);color:var(--text);font-size:22px;text-align:center;
+  font-family:var(--f-display);font-weight:600;letter-spacing:.05em}
+.spell-in:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 15%,transparent)}
+.spell-in.ok{border-color:var(--jade)} .spell-in.no{border-color:var(--rose)}
+.blank{display:inline-block;min-width:90px;border-bottom:2.5px dashed var(--accent);margin:0 5px}
+.cloze{font-size:clamp(16px,3.6vw,20px);line-height:1.9;text-align:left}
+
+/* ============ STATS ============ */
+.grid-s{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-bottom:26px}
+.stat{padding:18px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line)}
+.stat b{display:block;font-family:var(--f-display);font-size:31px;font-weight:900;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;line-height:1}
+.stat span{display:block;font-size:11.5px;color:var(--text-2);margin-top:6px}
+.ring{display:block;margin:0 auto 8px}
+.ring circle{fill:none;stroke-width:7;stroke-linecap:round}
+.ring .bgc{stroke:var(--surface-2)}
+.ring .fg{stroke:var(--accent);transition:stroke-dashoffset 1s var(--ease)}
+.heat{display:grid;grid-template-columns:repeat(auto-fill,minmax(13px,1fr));gap:3.5px}
+.hc{aspect-ratio:1;border-radius:3px;background:var(--surface-2)}
+.badges{display:grid;gap:11px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.badge{padding:16px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);
+  text-align:center;opacity:.34;filter:grayscale(1);transition:opacity .4s,filter .4s,transform .3s}
+.badge.got{opacity:1;filter:none}
+.badge.got:hover{transform:translateY(-3px)}
+.badge .em{font-size:27px;display:block;margin-bottom:7px}
+.badge b{display:block;font-size:12.5px;font-weight:700}
+.badge span{display:block;font-size:10.5px;color:var(--text-3);margin-top:3px;line-height:1.4}
+
+/* ============ BROWSE ============ */
+.search{position:relative;margin-bottom:14px}
+.search input{width:100%;padding:14px 16px 14px 42px;border-radius:var(--r);border:1.5px solid var(--line);
+  background:var(--surface);color:var(--text);font-size:15px}
+.search input:focus{outline:none;border-color:var(--accent)}
+.search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;
+  stroke:var(--text-3);fill:none;stroke-width:2}
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);
+  font-size:12.5px;font-weight:600;white-space:nowrap;flex-shrink:0;transition:background .2s,color .2s}
+.chip.on{background:var(--accent);color:#04140E;border-color:var(--accent)}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:13px;
+  background:var(--surface);border:1px solid var(--line);transition:transform .2s var(--ease)}
+.row:hover{transform:translateX(3px)}
+.row-w{font-family:var(--f-display);font-weight:600;font-size:17px;flex-shrink:0}
+.row-m{flex:1;font-size:13px;color:var(--text-2);font-family:'Noto Sans SC',sans-serif;line-height:1.45;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.star{flex-shrink:0;width:30px;height:30px;display:grid;place-items:center;border-radius:8px}
+.star svg{width:16px;height:16px;stroke:var(--text-3);fill:none;stroke-width:2;transition:all .2s}
+.star.on svg{stroke:var(--amber);fill:var(--amber)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text-3);flex-shrink:0}
+.dot.l1{background:var(--rose)} .dot.l2{background:var(--amber)} .dot.l3{background:var(--jade)}
+
+/* ============ MISC ============ */
+.empty{text-align:center;padding:64px 20px;color:var(--text-3)}
+.empty .em{font-size:44px;display:block;margin-bottom:14px;opacity:.55}
+.empty p{font-size:14px;line-height:1.6;max-width:280px;margin:0 auto}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(90px);z-index:60;
+  padding:13px 22px;border-radius:99px;background:var(--surface);border:1px solid var(--line);
+  box-shadow:var(--shadow);font-size:13.5px;font-weight:600;transition:transform .45s var(--ease);
+  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.done{text-align:center;padding:48px 20px}
+.done .em{font-size:60px;display:block;margin-bottom:18px;animation:pop .6s var(--ease)}
+@keyframes pop{0%{transform:scale(0) rotate(-25deg)}60%{transform:scale(1.22) rotate(8deg)}100%{transform:scale(1)}}
+.done h3{font-family:var(--f-display);font-size:29px;font-weight:900;margin-bottom:9px}
+.done p{color:var(--text-2);font-size:14.5px;margin-bottom:26px}
+.done-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-2{padding:13px 24px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);
+  font-weight:600;font-size:14px;transition:transform .2s}
+.btn-2:active{transform:scale(.96)}
+.timer{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px;padding:6px 13px;
+  border-radius:99px;background:var(--surface-2);font-variant-numeric:tabular-nums}
+.timer.warn{background:color-mix(in srgb,var(--rose) 22%,transparent);color:var(--rose)}
+.loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:90}
+.loading .sp{width:34px;height:34px;border:3px solid var(--surface-2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.big-ear{font-size:66px;margin-bottom:8px}
+@media(max-width:520px){
+  .grades{grid-template-columns:repeat(2,1fr)}
+  main{padding:20px 14px 96px}
+}
+</style>
+</head>
+<body>
+
+<div class="aura"><b></b><b></b><b></b></div>
+
+<!-- ══ GATE ══ -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="brand">词<em>径</em></div>
+    <div class="brand-sub">Wordpath</div>
+    <div class="gate-form">
+      <div class="field"><input id="pw" type="password" placeholder="请输入访问码" autocomplete="off" spellcheck="false"></div>
+      <div class="gate-err" id="pwErr"></div>
+      <button class="btn" id="pwGo">进入</button>
+    </div>
+    <p class="gate-hint">2,328 词 · 高考核心词汇</p>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <header>
+    <div class="hwrap">
+      <div class="logo">词<em>径</em></div>
+      <div class="streak" id="streakPill" title="连续学习天数">🔥 <span id="streakN">0</span></div>
+      <div class="spacer"></div>
+      <button class="icon-btn" id="themeBtn" aria-label="切换主题">
+        <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+    <div class="rail"><i id="railFill"></i></div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="view on" id="v-home">
+      <div class="eyebrow">词库</div>
+      <h2 class="t">选择词书</h2>
+      <p class="sub">可单独学习任一词书，也可合并为完整词库。</p>
+      <div class="decks" id="deckPicker"></div>
+
+      <div class="eyebrow">练习</div>
+      <h2 class="t">选择模式</h2>
+      <p class="sub">复习由系统自动安排——记不牢的词会更早再次出现。</p>
+      <div class="modes" id="modeGrid"></div>
+    </section>
+
+    <!-- STUDY -->
+    <section class="view" id="v-study"><div class="stage" id="studyBox"></div></section>
+
+    <!-- BROWSE -->
+    <section class="view" id="v-browse">
+      <div class="eyebrow">词典</div>
+      <h2 class="t">浏览单词</h2>
+      <p class="sub">可用英文或中文搜索。</p>
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" placeholder="搜索单词或中文释义" spellcheck="false">
+      </div>
+      <div class="chips" id="filterChips"></div>
+      <div class="list" id="wordList"></div>
+    </section>
+
+    <!-- STATS -->
+    <section class="view" id="v-stats">
+      <div class="eyebrow">进度</div>
+      <h2 class="t">学习统计</h2>
+      <p class="sub">数据保存在本机浏览器中。</p>
+      <div id="statsBody"></div>
+    </section>
+  </main>
+
+  <nav><div class="nwrap" id="navBar"></div></nav>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading" id="load"><div class="sp"></div></div>
+
+<script>
+/* ═══════════════ CONFIG ═══════════════
+   Change the password and data source here. Nothing else needs editing.  */
+const CONFIG = {
+  password: 'gaokao2026',
+  dataUrl:  'vocab.json',
+  dailyGoal: 20,
+  decks: {
+    1: { name: '核心词汇 887',  desc: '高中核心词表，按真题词频排序' },
+    2: { name: '高频词 1441',   desc: '高频词表，例句均配中文翻译' }
+  }
+};
+/* ═══════════════════════════════════════ */
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const LS = 'wordpath_v1';
+
+let WORDS = [], S = null, TTS = { voices: [], on: 'speechSynthesis' in window };
+
+/* ---------- state ---------- */
+const blank = () => ({
+  deck: 0,                 // 0 = all
+  srs: {},                 // id -> {lvl, due, seen, ok, miss}
+  fav: {},
+  seenDays: {},
+  streak: 0, lastDay: null,
+  todayCount: 0, todayDate: null,
+  totalOk: 0, totalTry: 0,
+  badges: {},
+  theme: 'dark'
+});
+const load = () => { try { return { ...blank(), ...JSON.parse(localStorage.getItem(LS) || '{}') }; } catch { return blank(); } };
+const save = () => { try { localStorage.setItem(LS, JSON.stringify(S)); } catch {} };
+const today = () => new Date().toISOString().slice(0, 10);
+
+/* ---------- srs (leitner-ish) ---------- */
+const GAPS = [0, 1, 2, 4, 8, 16, 32, 64];   // days per level
+function grade(id, g) {           // g: 0 again 1 hard 2 good 3 easy
+  const r = S.srs[id] || { lvl: 0, seen: 0, ok: 0, miss: 0 };
+  r.seen++;
+  if (g === 0) { r.lvl = 0; r.miss++; }
+  else { r.ok++; r.lvl = Math.min(GAPS.length - 1, r.lvl + (g === 1 ? 0 : g === 2 ? 1 : 2)); }
+  const d = new Date(); d.setDate(d.getDate() + (g === 0 ? 0 : GAPS[r.lvl]));
+  r.due = d.toISOString().slice(0, 10);
+  S.srs[id] = r;
+  S.totalTry++; if (g > 0) S.totalOk++;
+  bumpDay();
+  save();
+}
+function bumpDay() {
+  const t = today();
+  if (S.todayDate !== t) { S.todayDate = t; S.todayCount = 0; }
+  S.todayCount++;
+  S.seenDays[t] = (S.seenDays[t] || 0) + 1;
+  if (S.lastDay !== t) {
+    const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+    S.streak = S.lastDay === y ? S.streak + 1 : 1;
+    S.lastDay = t;
+  }
+  $('#streakN').textContent = S.streak;
+  checkBadges();
+}
+const pool = () => S.deck === 0 ? WORDS : WORDS.filter(w => w.d === S.deck);
+const dueList = () => { const t = today(); return pool().filter(w => { const r = S.srs[w.i]; return !r || !r.due || r.due <= t; }); };
+const learned = () => pool().filter(w => (S.srs[w.i]?.lvl || 0) >= 3).length;
+const acc = () => S.totalTry ? Math.round(S.totalOk / S.totalTry * 100) : 0;
+
+/* ---------- badges ---------- */
+const BADGES = [
+  { k: 'first',  em: '🌱', t: '第一步',     d: '学习 1 个单词',        f: () => S.totalTry >= 1 },
+  { k: 'ten',    em: '🎯', t: '热身完成',   d: '学习 10 个单词',      f: () => S.totalTry >= 10 },
+  { k: 'hun',    em: '💯', t: '百词达成',   d: '学习 100 个单词',     f: () => S.totalTry >= 100 },
+  { k: 'fivec',  em: '🏔️', t: '攀登者',     d: '学习 500 个单词',     f: () => S.totalTry >= 500 },
+  { k: 'goal',   em: '☀️', t: '每日目标',   d: `单日学习 ${CONFIG.dailyGoal} 词`, f: () => S.todayCount >= CONFIG.dailyGoal },
+  { k: 'st3',    em: '🔥', t: '三日连续',   d: '连续学习 3 天', f: () => S.streak >= 3 },
+  { k: 'st7',    em: '⚡', t: '七日坚持',   d: '连续学习 7 天', f: () => S.streak >= 7 },
+  { k: 'acc90',  em: '🎓', t: '精准',       d: '答题 50 次以上，正确率 90%',   f: () => S.totalTry >= 50 && acc() >= 90 },
+  { k: 'm50',    em: '📚', t: '小有所成',   d: '掌握 50 个单词',   f: () => WORDS.filter(w => (S.srs[w.i]?.lvl || 0) >= 3).length >= 50 },
+  { k: 'm250',   em: '👑', t: '词汇之王',   d: '掌握 250 个单词',    f: () => WORDS.filter(w => (S.srs[w.i]?.lvl || 0) >= 3).length >= 250 },
+];
+function checkBadges() {
+  BADGES.forEach(b => {
+    if (!S.badges[b.k] && b.f()) { S.badges[b.k] = today(); toast(`${b.em}  解锁成就：${b.t}`); }
+  });
+}
+
+/* ---------- tts ---------- */
+function loadVoices() { if (TTS.on) TTS.voices = speechSynthesis.getVoices(); }
+if (TTS.on) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+/* mobile browsers only allow speech after a user tap has "unlocked" it —
+   speak a silent utterance inside the first real tap to open the gate */
+let ttsPrimed = false;
+function primeTTS() {
+  if (!TTS.on || ttsPrimed) return;
+  ttsPrimed = true;
+  try {
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0; u.rate = 2;
+    speechSynthesis.speak(u);
+  } catch {}
+  loadVoices();
+}
+function say(text, btn) {
+  if (!TTS.on || !text) return;
+  if (!TTS.voices.length) loadVoices();          // android loads voices late
+  try { speechSynthesis.resume(); } catch {}     // android chrome: engine can stick in "paused"
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = .85;
+  const v = TTS.voices.find(x => /en-(US|GB)/i.test(x.lang) && /natural|enhanced|samantha|daniel|google/i.test(x.name))
+         || TTS.voices.find(x => /^en/i.test(x.lang));
+  if (v) u.voice = v;
+  if (btn) { btn.classList.add('play'); u.onend = u.onerror = () => btn.classList.remove('play'); }
+  speechSynthesis.speak(u);
+}
+
+/* ---------- utils ---------- */
+/* build a regex that catches the word plus common inflections (abandon -> abandoned) */
+function clozeRe(w) {
+  const base = w.w.split('(')[0].trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`\\b${base}(s|es|ed|d|ing|ly|er|ies|ied)?\\b`, 'i');
+}
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = ~~(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = s => (s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let toastT;
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2400); }
+const SPK = `<svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>`;
+const spk = (txt, cls = '') => `<button class="spk ${cls}" data-say="${esc(txt)}" aria-label="朗读">${SPK}</button>`;
+
+/* ---------- theme ---------- */
+function setTheme(t) {
+  document.documentElement.dataset.theme = t; S.theme = t; save();
+  $('#themeIcon').innerHTML = t === 'dark'
+    ? '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'
+    : '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+}
+
+/* ═══════════ NAV / VIEWS ═══════════ */
+const NAV = [
+  { k: 'home',   l: '学习',    i: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
+  { k: 'browse', l: '词典',    i: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M8 7h8M8 11h6"/>' },
+  { k: 'stats',  l: '进度', i: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>' },
+];
+$('#navBar').innerHTML = NAV.map(n =>
+  `<button class="nav-i" data-v="${n.k}"><svg viewBox="0 0 24 24">${n.i}</svg><span>${n.l}</span></button>`).join('');
+
+function go(v) {
+  $$('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
+  $$('.nav-i').forEach(x => x.classList.toggle('on', x.dataset.v === v));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (v === 'stats') drawStats();
+  if (v === 'browse') drawList();
+  if (v === 'home') drawHome();
+}
+
+/* ═══════════ HOME ═══════════ */
+const MODES = [
+  { k: 'flash',  t: '单词卡',     d: '翻卡自评，循环记忆',   i: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/>' },
+  { k: 'srs',    t: '今日复习',   d: '到期该复习的单词',     i: '<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>', due: true },
+  { k: 'quiz',   t: '英译中',     d: '选出正确的中文释义',   i: '<path d="M9 11l2.5 2.5L16 8"/><rect x="3" y="3" width="18" height="18" rx="3"/>' },
+  { k: 'rev',    t: '中译英',     d: '回想对应的英文单词',   i: '<path d="M8 7h12M8 12h12M8 17h12"/><path d="M3.5 7h.01M3.5 12h.01M3.5 17h.01"/>' },
+  { k: 'listen', t: '听力辨词',   d: '听发音，选单词',       i: '<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>' },
+  { k: 'spell',  t: '拼写练习',   d: '听发音，拼出单词',     i: '<rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/>' },
+  { k: 'cloze',  t: '句子填空',   d: '补全真题例句',         i: '<path d="M4 7h6M4 12h16M4 17h10"/><path d="M14 7h6" stroke-dasharray="2 2"/>' },
+  { k: 'timed',  t: '限时挑战',   d: '60 秒，越快越好',      i: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>' },
+];
+
+function drawHome() {
+  const dk = [0, 1, 2].map(d => {
+    const p = d === 0 ? WORDS : WORDS.filter(w => w.d === d);
+    const done = p.filter(w => (S.srs[w.i]?.lvl || 0) >= 3).length;
+    const pct = p.length ? Math.round(done / p.length * 100) : 0;
+    const meta = d === 0
+      ? { name: '全部词汇', desc: '两份词书合并，重复词各自保留' }
+      : CONFIG.decks[d];
+    return `<button class="deck ${S.deck === d ? 'on' : ''}" data-deck="${d}">
+      <div class="deck-n">${p.length}</div>
+      <div class="deck-t">${esc(meta.name)}</div>
+      <div class="deck-d">${esc(meta.desc)}</div>
+      <div class="deck-bar"><i style="width:${pct}%"></i></div>
+      <div class="deck-pct">已掌握 ${done} · ${pct}%</div>
+    </button>`;
+  }).join('');
+  $('#deckPicker').innerHTML = dk;
+
+  const dueN = dueList().length;
+  $('#modeGrid').innerHTML = MODES.map(m => `
+    <button class="mode" data-mode="${m.k}">
+      ${m.due && dueN ? `<span class="due">${dueN > 99 ? '99+' : dueN}</span>` : ''}
+      <div class="ic"><svg viewBox="0 0 24 24">${m.i}</svg></div>
+      <h3>${m.t}</h3><p>${m.d}</p>
+    </button>`).join('');
+
+  const p = pool();
+  $('#railFill').style.transform = `scaleX(${p.length ? learned() / p.length : 0})`;
+}
+
+/* ═══════════ SESSION ENGINE ═══════════ */
+let sess = null;
+
+function start(mode) {
+  const p = pool();
+  if (!p.length) return toast('该词书为空');
+  let q = mode === 'srs' ? dueList() : p;
+  if (mode === 'srs' && !q.length) return toast('暂无到期单词，明天再来');
+  if (mode === 'cloze') q = q.filter(w => w.e?.length && clozeRe(w).test(w.e[0][0]));
+  if (!q.length) return toast('该模式暂无可用单词');
+
+  const n = mode === 'timed' ? 999 : Math.min(mode === 'srs' ? q.length : 15, q.length);
+  sess = { mode, q: shuffle(q).slice(0, n), i: 0, ok: 0, flip: false, t0: Date.now(), timeLeft: 60, timer: null };
+  go('study');
+  if (mode === 'timed') {
+    sess.timer = setInterval(() => {
+      sess.timeLeft--;
+      const el = $('#tmr'); if (el) { el.textContent = sess.timeLeft + 's'; el.classList.toggle('warn', sess.timeLeft <= 10); }
+      if (sess.timeLeft <= 0) { clearInterval(sess.timer); finish(); }
+    }, 1000);
+  }
+  render();
+}
+
+function next() {
+  sess.i++; sess.flip = false;
+  if (sess.mode === 'timed') { if (sess.i >= sess.q.length) sess.q = sess.q.concat(shuffle(pool()).slice(0, 20)); render(); return; }
+  sess.i >= sess.q.length ? finish() : render();
+}
+
+function finish() {
+  if (sess.timer) clearInterval(sess.timer);
+  const tot = sess.mode === 'timed' ? sess.i : sess.q.length;
+  const pct = tot ? Math.round(sess.ok / tot * 100) : 0;
+  const em = pct >= 90 ? '🏆' : pct >= 70 ? '✨' : pct >= 50 ? '👍' : '🌱';
+  const secs = Math.round((Date.now() - sess.t0) / 1000);
+  $('#studyBox').innerHTML = `<div class="done">
+    <span class="em">${em}</span>
+    <h3>${sess.ok} / ${tot}</h3>
+    <p>正确率 ${pct}% · 用时 ${secs < 60 ? secs + ' 秒' : Math.floor(secs / 60) + ' 分 ' + secs % 60 + ' 秒'}${S.todayCount >= CONFIG.dailyGoal ? ' · 已达成今日目标 ☀️' : ''}</p>
+    <div class="done-btns">
+      <button class="btn" style="padding:13px 26px" data-again>再来一组</button>
+      <button class="btn-2" data-home>返回模式</button>
+    </div></div>`;
+  $('#studyBox').querySelector('[data-again]').onclick = () => start(sess.mode);
+  $('#studyBox').querySelector('[data-home]').onclick = () => go('home');
+  save();
+}
+
+const topBar = extra => {
+  const n = sess.mode === 'timed' ? sess.i + 1 : `${sess.i + 1} / ${sess.q.length}`;
+  return `<div class="bar-top">
+    <button class="icon-btn" data-quit aria-label="退出"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+    <span class="count">${n}</span>
+    <div class="spacer"></div>
+    ${extra || ''}
+    <span class="count">✓ ${sess.ok}</span>
+  </div>`;
+};
+
+function wrongOpts(w, key, n = 3) {
+  const p = pool().filter(x => x.i !== w.i && x[key]);
+  return shuffle(p).slice(0, n);
+}
+
+function render() {
+  const w = sess.q[sess.i], m = sess.mode;
+  const box = $('#studyBox');
+  const tmr = m === 'timed' ? `<span class="timer" id="tmr">${sess.timeLeft}s</span>` : '';
+
+  /* ---- FLASHCARD / SRS ---- */
+  if (m === 'flash' || m === 'srs') {
+    const exs = (w.e || []).slice(0, 2).map(e => `<div class="ex">
+        <div class="ex-head"><div class="ex-en">${esc(e[0])}</div>${spk(e[0])}</div>
+        ${e[1] ? `<div class="ex-zh">${esc(e[1])}</div>` : ''}
+      </div>`).join('');
+    box.innerHTML = topBar(tmr) + `
+      <div class="flip" id="flip"><div class="flip-in">
+        <div class="face" data-flip>
+          <div class="w-main">${esc(w.w)}${spk(w.w)}</div>
+          ${w.p ? `<div class="w-ph">${esc(w.p)}</div>` : ''}
+          ${w.s ? `<div class="pos-row">${w.s.map(x => `<span class="pos">${esc(x)}</span>`).join('')}</div>` : ''}
+          ${w.f ? `<div class="freq">真题中出现 ${w.f} 次</div>` : ''}
+          <div class="tap">点击查看释义</div>
+        </div>
+        <div class="face b" data-flip>
+          <div class="w-mean">${esc(w.m)}</div>
+          ${exs}
+          ${w.r ? `<div class="src">${esc(w.r)}</div>` : ''}
+        </div>
+      </div></div>
+      <div class="grades" id="gr" style="visibility:hidden">
+        <button class="grade" data-g="0">重来<small>今天</small></button>
+        <button class="grade" data-g="1">困难<small>1 天</small></button>
+        <button class="grade" data-g="2">良好<small>${GAPS[Math.min(7, (S.srs[w.i]?.lvl || 0) + 1)]} 天</small></button>
+        <button class="grade" data-g="3">简单<small>${GAPS[Math.min(7, (S.srs[w.i]?.lvl || 0) + 2)]} 天</small></button>
+      </div>`;
+    box.querySelectorAll('[data-flip]').forEach(f => f.onclick = e => {
+      if (e.target.closest('.spk')) return;
+      sess.flip = true; $('#flip').classList.add('on'); $('#gr').style.visibility = 'visible';
+    });
+    box.querySelectorAll('.grade').forEach(b => b.onclick = () => {
+      const g = +b.dataset.g; grade(w.i, g); if (g > 0) sess.ok++;
+      next();
+    });
+  }
+
+  /* ---- QUIZ  EN→中文 ---- */
+  else if (m === 'quiz') {
+    const opts = shuffle([w, ...wrongOpts(w, 'm')]);
+    box.innerHTML = topBar(tmr) + `
+      <div class="q-prompt">
+        <div class="q-word">${esc(w.w)}${spk(w.w)}</div>
+        ${w.p ? `<div class="w-ph">${esc(w.p)}</div>` : ''}
+      </div>
+      <div class="opts">${opts.map(o => `<button class="opt" data-id="${o.i}">${esc(o.m)}</button>`).join('')}</div>`;
+    bindOpts(box, w);
+  }
+
+  /* ---- REVERSE 中文→EN ---- */
+  else if (m === 'rev') {
+    const opts = shuffle([w, ...wrongOpts(w, 'w')]);
+    box.innerHTML = topBar(tmr) + `
+      <div class="q-prompt"><div class="q-word zh">${esc(w.m)}</div>
+      <div class="q-hint">这是哪个英文单词？</div></div>
+      <div class="opts">${opts.map(o => `<button class="opt en" data-id="${o.i}">${esc(o.w)}</button>`).join('')}</div>`;
+    bindOpts(box, w);
+  }
+
+  /* ---- LISTENING ---- */
+  else if (m === 'listen') {
+    const opts = shuffle([w, ...wrongOpts(w, 'w')]);
+    box.innerHTML = topBar(tmr) + `
+      <div class="q-prompt">
+        <div class="big-ear">👂</div>
+        <button class="spk" data-say="${esc(w.w)}" style="width:52px;height:52px;border-radius:14px">${SPK}</button>
+        <div class="q-hint">点击重听</div>
+      </div>
+      <div class="opts">${opts.map(o => `<button class="opt en" data-id="${o.i}">${esc(o.w)}</button>`).join('')}</div>`;
+    say(w.w);   // synchronous — a delayed call loses the tap "permission" on iPhones
+    bindOpts(box, w);
+  }
+
+  /* ---- SPELLING ---- */
+  else if (m === 'spell') {
+    box.innerHTML = topBar(tmr) + `
+      <div class="q-prompt">
+        <button class="spk" data-say="${esc(w.w)}" style="width:52px;height:52px;border-radius:14px">${SPK}</button>
+        <div class="w-mean" style="margin:16px 0 0;font-size:17px">${esc(w.m)}</div>
+        <div class="q-hint">${w.w.length} 个字母${w.p ? ' · ' + esc(w.p) : ''}</div>
+      </div>
+      <input class="spell-in" id="sp" placeholder="输入单词" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div style="height:12px"></div>
+      <button class="btn" style="width:100%" id="spGo">检查</button>`;
+    say(w.w);
+    setTimeout(() => $('#sp').focus(), 250);
+    const submit = () => {
+      const inp = $('#sp'), val = inp.value.trim().toLowerCase();
+      if (!val) return;
+      const right = val === w.w.toLowerCase();
+      inp.classList.add(right ? 'ok' : 'no'); inp.disabled = true;
+      if (right) { sess.ok++; grade(w.i, 2); toast('✓ 正确'); }
+      else { grade(w.i, 0); toast(`✗ ${w.w}`); }
+      setTimeout(next, right ? 620 : 1450);
+    };
+    $('#spGo').onclick = submit;
+    $('#sp').onkeydown = e => { if (e.key === 'Enter') submit(); };
+  }
+
+  /* ---- CLOZE ---- */
+  else if (m === 'cloze') {
+    const ex = w.e[0];
+    const hidden = esc(ex[0]).replace(clozeRe(w), '<span class="blank"></span>');
+    const opts = shuffle([w, ...wrongOpts(w, 'w')]);
+    box.innerHTML = topBar(tmr) + `
+      <div class="q-prompt" style="padding:26px 22px">
+        <div class="cloze">${hidden}</div>
+        ${ex[1] ? `<div class="ex-zh" style="margin-top:14px;text-align:left;width:100%">${esc(ex[1])}</div>` : ''}
+      </div>
+      <div class="opts">${opts.map(o => `<button class="opt en" data-id="${o.i}">${esc(o.w)}</button>`).join('')}</div>`;
+    bindOpts(box, w, () => say(ex[0]));
+  }
+
+  /* ---- TIMED (mixed quick quiz) ---- */
+  else if (m === 'timed') {
+    const opts = shuffle([w, ...wrongOpts(w, 'm')]);
+    box.innerHTML = topBar(tmr) + `
+      <div class="q-prompt"><div class="q-word">${esc(w.w)}</div></div>
+      <div class="opts">${opts.map(o => `<button class="opt" data-id="${o.i}">${esc(o.m)}</button>`).join('')}</div>`;
+    bindOpts(box, w, null, 420);
+  }
+
+  box.querySelector('[data-quit]').onclick = () => { if (sess.timer) clearInterval(sess.timer); go('home'); };
+}
+
+function bindOpts(box, w, after, delay) {
+  box.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const right = +b.dataset.id === w.i || b.dataset.id === String(w.i);
+    box.querySelectorAll('.opt').forEach(x => {
+      x.disabled = true;
+      if (x.dataset.id === String(w.i)) x.classList.add('ok');
+    });
+    if (!right) b.classList.add('no');
+    if (right) sess.ok++;
+    grade(w.i, right ? 2 : 0);
+    if (after) after();
+    setTimeout(next, delay || (right ? 560 : 1180));
+  });
+}
+
+/* ═══════════ BROWSE ═══════════ */
+let filter = 'all';
+const FILTERS = [
+  { k: 'all',    l: '全部' },
+  { k: 'fav',    l: '★ 收藏' },
+  { k: 'new',    l: '未学' },
+  { k: 'weak',   l: '薄弱' },
+  { k: 'strong', l: '已掌握' },
+];
+$('#filterChips').innerHTML = FILTERS.map(f => `<button class="chip ${f.k === 'all' ? 'on' : ''}" data-f="${f.k}">${f.l}</button>`).join('');
+
+function drawList() {
+  const q = $('#q').value.trim().toLowerCase();
+  let out = pool();
+  if (q) out = out.filter(w => w.w.toLowerCase().includes(q) || w.m.toLowerCase().includes(q));
+  if (filter === 'fav') out = out.filter(w => S.fav[w.i]);
+  else if (filter === 'new') out = out.filter(w => !S.srs[w.i]);
+  else if (filter === 'weak') out = out.filter(w => { const r = S.srs[w.i]; return r && r.lvl <= 1 && r.seen > 0; });
+  else if (filter === 'strong') out = out.filter(w => (S.srs[w.i]?.lvl || 0) >= 3);
+
+  if (!out.length) {
+    $('#wordList').innerHTML = `<div class="empty"><span class="em">🔍</span><p>没有匹配的单词，换个关键词或筛选条件试试。</p></div>`;
+    return;
+  }
+  const cap = out.slice(0, 300);
+  $('#wordList').innerHTML = cap.map(w => {
+    const lvl = S.srs[w.i]?.lvl || 0;
+    const cls = !S.srs[w.i] ? '' : lvl <= 1 ? 'l1' : lvl < 3 ? 'l2' : 'l3';
+    return `<div class="row">
+      <span class="dot ${cls}"></span>
+      <span class="row-w">${esc(w.w)}</span>
+      ${spk(w.w)}
+      <span class="row-m">${esc(w.m)}</span>
+      <button class="star ${S.fav[w.i] ? 'on' : ''}" data-fav="${w.i}" aria-label="收藏">
+        <svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg>
+      </button></div>`;
+  }).join('') + (out.length > 300 ? `<div class="empty" style="padding:24px"><p>仅显示前 300 个（共 ${out.length} 个），请缩小搜索范围。</p></div>` : '');
+}
+
+/* ═══════════ STATS ═══════════ */
+function drawStats() {
+  const p = pool(), done = learned();
+  const pct = p.length ? Math.round(done / p.length * 100) : 0;
+  const C = 2 * Math.PI * 42;
+  const days = [...Array(91)].map((_, i) => {
+    const d = new Date(Date.now() - (90 - i) * 864e5).toISOString().slice(0, 10);
+    return S.seenDays[d] || 0;
+  });
+  const started = Object.keys(S.srs).length;
+  const goalPct = Math.min(100, Math.round((S.todayDate === today() ? S.todayCount : 0) / CONFIG.dailyGoal * 100));
+
+  $('#statsBody').innerHTML = `
+    <div class="card" style="text-align:center;margin-bottom:22px">
+      <svg class="ring" width="120" height="120" viewBox="0 0 100 100">
+        <circle class="bgc" cx="50" cy="50" r="42"/>
+        <circle class="fg" cx="50" cy="50" r="42" transform="rotate(-90 50 50)"
+          stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct / 100)}"/>
+      </svg>
+      <div style="font-family:var(--f-display);font-size:31px;font-weight:900">${pct}%</div>
+      <div style="color:var(--text-2);font-size:13px;margin-top:4px">已掌握 ${done} / ${p.length}</div>
+    </div>
+
+    <div class="grid-s">
+      <div class="stat"><b>${started}</b><span>已学单词</span></div>
+      <div class="stat"><b>${acc()}%</b><span>正确率</span></div>
+      <div class="stat"><b>${S.streak}</b><span>连续天数</span></div>
+      <div class="stat"><b>${dueList().length}</b><span>今日待复习</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px">
+      <div class="eyebrow" style="margin-bottom:10px">今日 · 目标 ${CONFIG.dailyGoal} 词</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <b style="font-family:var(--f-display);font-size:27px;font-weight:900">${S.todayDate === today() ? S.todayCount : 0}</b>
+        <span style="color:var(--text-3);font-size:13px">已复习</span>
+      </div>
+      <div class="deck-bar"><i style="width:${goalPct}%"></i></div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px">
+      <div class="eyebrow" style="margin-bottom:12px">最近 90 天</div>
+      <div class="heat">${days.map(n => {
+        const o = n === 0 ? 0 : n < 5 ? .3 : n < 15 ? .55 : n < 30 ? .78 : 1;
+        return `<div class="hc" title="${n} 次复习" style="${o ? `background:var(--accent);opacity:${o}` : ''}"></div>`;
+      }).join('')}</div>
+    </div>
+
+    <div class="eyebrow">成就 · ${Object.keys(S.badges).length}/${BADGES.length}</div>
+    <div class="badges" style="margin-bottom:22px">${BADGES.map(b => `
+      <div class="badge ${S.badges[b.k] ? 'got' : ''}">
+        <span class="em">${b.em}</span><b>${b.t}</b><span>${b.d}</span>
+      </div>`).join('')}</div>
+
+    <button class="btn-2" id="resetBtn" style="width:100%;color:var(--rose)">重置所有进度</button>`;
+
+  $('#resetBtn').onclick = () => {
+    if (!confirm('将清除本机的学习进度、连续天数和收藏，确定继续吗？')) return;
+    const th = S.theme; S = blank(); S.theme = th; save(); toast('进度已重置'); drawStats(); drawHome();
+    $('#streakN').textContent = 0;
+  };
+}
+
+/* ═══════════ EVENTS ═══════════ */
+document.addEventListener('click', e => {
+  primeTTS();
+  const s = e.target.closest('[data-say]');
+  if (s) { e.stopPropagation(); say(s.dataset.say, s); return; }
+
+  const d = e.target.closest('[data-deck]');
+  if (d) { S.deck = +d.dataset.deck; save(); drawHome(); return; }
+
+  const m = e.target.closest('[data-mode]');
+  if (m) { start(m.dataset.mode); return; }
+
+  const n = e.target.closest('[data-v]');
+  if (n) { go(n.dataset.v); return; }
+
+  const f = e.target.closest('[data-fav]');
+  if (f) { const id = f.dataset.fav; S.fav[id] ? delete S.fav[id] : S.fav[id] = 1; save(); f.classList.toggle('on'); return; }
+
+  const c = e.target.closest('[data-f]');
+  if (c) { filter = c.dataset.f; $$('.chip').forEach(x => x.classList.toggle('on', x === c)); drawList(); return; }
+});
+$('#q').oninput = drawList;
+$('#themeBtn').onclick = () => setTheme(S.theme === 'dark' ? 'light' : 'dark');
+
+document.addEventListener('keydown', e => {
+  if ($('#v-study').classList.contains('on') && sess) {
+    if (e.key === ' ' && (sess.mode === 'flash' || sess.mode === 'srs')) {
+      e.preventDefault();
+      if (!sess.flip) { sess.flip = true; $('#flip')?.classList.add('on'); const g = $('#gr'); if (g) g.style.visibility = 'visible'; }
+    }
+    if (/^[1-4]$/.test(e.key) && sess.flip) $(`.grade[data-g="${+e.key - 1}"]`)?.click();
+    if (e.key === 'Escape') go('home');
+  }
+});
+
+/* ═══════════ GATE + BOOT ═══════════ */
+function unlock() {
+  primeTTS();
+  const v = $('#pw').value;
+  if (v === CONFIG.password) {
+    sessionStorage.setItem('wp_ok', '1');
+    $('#gate').classList.add('out');
+    $('#app').classList.add('on');
+    setTimeout(() => $('#gate').style.display = 'none', 700);
+  } else {
+    $('#pwErr').textContent = '访问码有误，请重试';
+    $('.gate-card').classList.add('shake');
+    setTimeout(() => $('.gate-card').classList.remove('shake'), 450);
+    $('#pw').select();
+  }
+}
+$('#pwGo').onclick = unlock;
+$('#pw').onkeydown = e => { if (e.key === 'Enter') unlock(); };
+
+async function boot() {
+  S = load();
+  setTheme(S.theme || 'dark');
+  try {
+    const r = await fetch(CONFIG.dataUrl);
+    if (!r.ok) throw new Error(r.status);
+    WORDS = await r.json();
+  } catch (err) {
+    $('#load').innerHTML = `<div class="empty" style="padding:30px">
+      <span class="em">📁</span>
+      <p><b>词库加载失败</b><br><br>
+      未找到 <code style="font-family:JetBrains Mono,monospace;font-size:12px">${CONFIG.dataUrl}</code>。
+      请通过 HTTP 访问本目录，而不是直接双击打开文件。</p></div>`;
+    return;
+  }
+  $('#load').style.display = 'none';
+  $('#streakN').textContent = S.streak;
+  drawHome();
+  if (sessionStorage.getItem('wp_ok')) {
+    $('#gate').style.display = 'none'; $('#app').classList.add('on');
+  } else {
+    setTimeout(() => $('#pw').focus(), 400);
+  }
+}
+boot();
+</script>
+</body>
+</html>
